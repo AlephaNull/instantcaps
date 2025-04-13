@@ -6,6 +6,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Access your API key as an environment variable (see "Set up your API key" above)
+const genAI = new GoogleGenerativeAI("AIzaSyACXuqPtmQvYJjDpx8eeohthOBff2CUfSA");
+
+const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-pro' });
+
+const imageResp = await fetch(
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Palace_of_Westminster_from_the_dome_on_Methodist_Central_Hall.jpg/2560px-Palace_of_Westminster_from_the_dome_on_Methodist_Central_Hall.jpg'
+)
+    .then((response) => response.arrayBuffer());
+
+const result = await model.generateContent([
+    {
+        inlineData: {
+            data: Buffer.from(imageResp).toString("base64"),
+            mimeType: "image/jpeg",
+        },
+    },
+    'write a small instagram caption for this image. make it under 50 words and make it sound genz. remove all formatting. give me only one',
+]);
+console.log(result.response.text());
 export default function InstagramPost() {
   return (
     <div className="flex justify-center w-full p-4">
@@ -58,9 +80,9 @@ export default function InstagramPost() {
           <div className="px-4 pb-2">
             <p>
               <Link href="#" className="font-medium mr-1">
-                username
+                <strong>username</strong>
               </Link>
-              This is a caption for the Instagram post with a placeholder image. #instagram #post #placeholder
+              This is a caption for the Instagram post with a placeholder image.             
             </p>
           </div>
           <div className="px-4 py-3 border-t text-xs text-muted-foreground">2 HOURS AGO</div>
